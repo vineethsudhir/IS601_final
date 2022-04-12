@@ -1,6 +1,6 @@
 """A simple flask web app"""
 import os
-from flask import Flask
+from flask import Flask, render_template
 from app.cli import create_database
 from app.db import db
 from app.db.models import User
