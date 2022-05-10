@@ -1,4 +1,4 @@
-name: Production Workflow 1
+name: Production Workflow
 
 on:
   push:
@@ -39,7 +39,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: vs56/auth601
+          images: vs56/final-601
 
       - name: Build and push
         uses: docker/build-push-action@v2
@@ -55,6 +55,6 @@ jobs:
       - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "auth601" #Must be unique in Heroku
+          heroku_app_name: "final-prod-601" #Must be unique in Heroku
           heroku_email: "vs56@njit.edu"
           usedocker: true
