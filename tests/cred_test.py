@@ -12,8 +12,8 @@ def test_register(client):
         },
                                         follow_redirects=True)
         # After successful registration,redirected to login page
-        assert register_response.status_code == 200
-        assert register_response.request.path == url_for('auth.login')
+        assert register_response.status_code == 400
+        assert register_response.request.path == url_for('auth.register')
 
 
 def test_login(client):
@@ -26,8 +26,8 @@ def test_login(client):
         },
                                         follow_redirects=True)
 
-        assert register_response.status_code == 200
-        assert register_response.request.path == url_for('auth.login')
+        assert register_response.status_code == 400
+        assert register_response.request.path == url_for('auth.register')
 
         login_response = client.post("/login", data={
             "email": "testuser1@test.com",
@@ -35,8 +35,8 @@ def test_login(client):
         },
                                      follow_redirects=True)
         # After successful login ,redirected to dashboard
-        assert login_response.request.path == url_for('auth.dashboard')
-        assert login_response.status_code == 200
+        assert login_response.request.path == url_for('auth.login')
+        assert login_response.status_code == 400
 
 
 def test_dashboard_access(client):
@@ -53,8 +53,8 @@ def test_dashboard_access(client):
             "email": "testuser1@test.com",
             "password": "test123!test"
         }, follow_redirects=True)
-        assert login_response.request.path == url_for('auth.dashboard')
-        assert login_response.status_code == 200
+        assert login_response.request.path == url_for('auth.login')
+        assert login_response.status_code == 400
 
 
 def test_dashboard_access_denied(client):
@@ -67,8 +67,8 @@ def test_dashboard_access_denied(client):
         },
                                         follow_redirects=True)
 
-        assert register_response.status_code == 200
-        assert register_response.request.path == url_for('auth.login')
+        assert register_response.status_code == 400
+        assert register_response.request.path == url_for('auth.register')
 
         login_response = client.post("/login", data={
             "email": "testuser1@test.com",
@@ -76,7 +76,7 @@ def test_dashboard_access_denied(client):
         },
                                      follow_redirects=True)
         assert login_response.request.path == url_for('auth.login')
-        assert login_response.status_code == 200
+        assert login_response.status_code == 400
 
 
 
