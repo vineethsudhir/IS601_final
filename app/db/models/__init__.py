@@ -10,24 +10,25 @@ from sqlalchemy_serializer import SerializerMixin
 
 class Transaction(db.Model, SerializerMixin):
     __tablename__ = 'transactions'
-    serialize_only = ('amount', 'type')
     id = db.Column(db.Integer, primary_key=True)
-    amount = db.Column(db.Integer, nullable=True, unique=False)
-    type = db.Column(db.String(300), nullable=True, unique=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    amount = db.Column(db.Integer, unique=False)
+    transaction_type = db.Column(db.String(300), unique=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=False)
     user = relationship("User", back_populates="transactions", uselist=False)
 
-    def __init__(self, amount,type):
+    def __init__(self, user_id, amount, transaction_type):
+        self.user_id = user_id
         self.amount = amount
-        self.type = type
+        self.transaction_type = transaction_type
 
+    def get_amount(self):
+        return self.amount
 
-    def serialize(self):
-        return {
-            'amount': self.amount,
-            'type': self.type,
-        }
+    def get_transaction_type(self):
+        return self.transaction_type
 
+    def get_user_id(self):
+        return self.user_id
 
 
 class User(UserMixin, db.Model):
@@ -40,12 +41,8 @@ class User(UserMixin, db.Model):
     registered_on = db.Column('registered_on', db.DateTime)
     active = db.Column('is_active', db.Boolean(), nullable=False, server_default='1')
     is_admin = db.Column('is_admin', db.Boolean(), nullable=False, server_default='0')
-    # songs = db.relationship("Song", back_populates="user", cascade="all, delete")
-    # locations = db.relationship("Location", back_populates="user", cascade="all, delete")
+    balance = db.Column(db.Integer, unique=False, default=0)
     transactions = db.relationship("Transaction", back_populates="user", cascade="all, delete")
-    balance = db.Column(db.Integer, nullable=True)
-    inital_balance = 0
-
 
     # `roles` and `groups` are reserved words that *must* be defined
     # on the `User` model to use group- or role-based authorization.
@@ -60,18 +57,6 @@ class User(UserMixin, db.Model):
 
     def is_active(self):
         return True
-
-    def set_balance(self, balance):
-        self.balance = balance
-
-    def set_inital_balance(self, inital_balance):
-        self.inital_balance = inital_balance
-
-    def get_balance(self):
-        if self.balance is None:
-            return 0
-        else :
-            return db.session.query(functions.sum(Transaction.amount)).scalar()
 
     def is_anonymous(self):
         return False

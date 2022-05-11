@@ -23,6 +23,7 @@ from flask_cors import CORS
 
 login_manager = flask_login.LoginManager()
 
+
 def create_app():
     """Create and configure an instance of the Flask application."""
     app = Flask(__name__)

@@ -1,6 +1,8 @@
-from flask import Blueprint, render_template, redirect, url_for, flash,current_app
+import flask
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app, abort
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash
+from jinja2 import TemplateNotFound
 
 from app.auth.decorators import admin_required
 from app.auth.forms import login_form, register_form, profile_form, security_form, user_edit_form
@@ -32,6 +34,7 @@ def register():
             return redirect(url_for('auth.login'), 302)
     return render_template('register.html', form=form)
 
+
 @auth.route('/login', methods=['POST', 'GET'])
 def login():
     form = login_form()
@@ -51,6 +54,7 @@ def login():
             return redirect(url_for('auth.dashboard'))
     return render_template('login.html', form=form)
 
+
 @auth.route("/logout")
 @login_required
 def logout():
@@ -63,25 +67,37 @@ def logout():
     return redirect(url_for('auth.login'))
 
 
-
 @auth.route('/dashboard', methods=['GET'], defaults={"page": 1})
+@auth.route('/dashboard/<int:page>', methods=['GET'])
 @login_required
 def dashboard(page):
     page = page
     per_page = 1000
-    ball = 0
-    if current_user.balance is None:
-        ball = 0
-    else:
-        ball = current_user.balance
-    pagination = Transaction.query.paginate(page, per_page, error_out=False)
-    data = pagination.items
+    pagination = Transaction.query.filter_by(user_id=current_user.id).paginate(page, per_page, error_out=False)
+    user_object = User.query.get(current_user.id)
+    data = []
+    for count, item in enumerate(pagination.items):
+        transaction = pagination.items[count]
+        transaction_amount = transaction.amount
+        transaction_type = transaction.transaction_type
+        transaction_user = transaction.user_id
+
+        data.append({
+            'id': count + 1,
+            'Transaction Amount': transaction_amount,
+            'Transaction Type': transaction_type,
+            'Transaction User': transaction_user
+        })
+    user_balance = user_object.balance
+
     try:
-        return render_template('dashboard.html', data=data, pagination=pagination, ball= ball)
+        return render_template('dashboard.html', data=data, pagination=pagination, user_balance=user_balance)
     except TemplateNotFound:
         abort(404)
 
+
 @auth.route('/profile', methods=['POST', 'GET'])
+@login_required
 def edit_profile():
     user = User.query.get(current_user.get_id())
     form = profile_form(obj=user)
@@ -95,6 +111,7 @@ def edit_profile():
 
 
 @auth.route('/account', methods=['POST', 'GET'])
+@login_required
 def edit_account():
     user = User.query.get(current_user.get_id())
     form = security_form(obj=user)
@@ -107,9 +124,6 @@ def edit_account():
         return redirect(url_for('auth.dashboard'))
     return render_template('manage_account.html', form=form)
 
-
-
-#You should probably move these to a new Blueprint to clean this up.  These functions below are for user management
 
 @auth.route('/users')
 @login_required

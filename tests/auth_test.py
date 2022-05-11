@@ -46,11 +46,12 @@ def test_user_menu_links_after_login(client):
         },
                                      follow_redirects=True)
 
-        assert login_response.status_code == 400
+        assert login_response.status_code == 200
 
         response = client.get("/profile")
-        assert response.status_code == 302
+        assert response.status_code == 200
         response = client.get("/account")
-        assert response.status_code == 302
+        assert response.status_code == 200
         response = client.get("/logout")
         assert response.status_code == 302
+        assert b'href="/login"' in response.data
