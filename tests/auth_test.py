@@ -18,5 +18,5 @@ def test_auth_pages(client):
 
 def test_csv_upload(client):
     """This tests csv upload without login"""
-    response = client.get("/songs/upload")
+    response = client.get("/transactions/upload")
     assert response.status_code == 302
