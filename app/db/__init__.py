@@ -10,9 +10,11 @@ db = SQLAlchemy()
 
 database = Blueprint('database', __name__,)
 
+
 @database.cli.command('create')
 def init_db():
     db.create_all()
+
 
 @database.before_app_first_request
 def create_db_file_if_does_not_exist():
@@ -24,6 +26,7 @@ def create_db_file_if_does_not_exist():
         os.mkdir(dbdir)
     db.create_all()
 
+
 @database.before_app_first_request
 def create_upload_folder():
     root = config.Config.BASE_DIR
@@ -32,14 +35,4 @@ def create_upload_folder():
     # make a directory if it doesn't exist
     if not os.path.exists(uploadfolder):
         os.mkdir(uploadfolder)
-    db.create_all()
-
-@database.before_app_first_request
-def create_log_folder():
-    root = config.Config.BASE_DIR
-    # set the name of the apps log folder to logs
-    logfolder = os.path.join(root,'..',config.Config.LOG_DIR)
-    # make a directory if it doesn't exist
-    if not os.path.exists(logfolder):
-        os.mkdir(logfolder)
     db.create_all()
