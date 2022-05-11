@@ -2,8 +2,6 @@ import logging
 
 from flask_login import current_user
 
-from flask import app
-
 from app import db
 from app.db.models import User, Transaction
 from faker import Faker
@@ -17,7 +15,7 @@ def test_adding_user(application):
         assert db.session.query(Transaction).count() == 0
         # showing how to add a record
         # create a record
-        user = User('a@b.com', 'atest')
+        user = User('sbangaloreashok@gmail.com', 'sumanatest')
         # add it to get ready to be committed
         db.session.add(user)
         # call the commit
@@ -25,10 +23,10 @@ def test_adding_user(application):
         # assert that we now have a new user
         assert db.session.query(User).count() == 1
         # finding one user record by email
-        user = User.query.filter_by(email='a@b.com').first()
+        user = User.query.filter_by(email='sbangaloreashok@gmail.com').first()
         log.info(user)
         # asserting that the user retrieved is correct
-        assert user.email == 'a@b.com'
+        assert user.email == 'sbangaloreashok@gmail.com'
         # this is how you get a related record ready for insert
         user.transactions = [Transaction("1", "2000", "CREDIT"), Transaction("2", "-1000", "DEBIT")]
         # commit is what saves the transactions
@@ -63,10 +61,10 @@ def test_edit_user_profile(client):
         },
                                      follow_redirects=True)
 
-        assert login_response.status_code == 400
+        assert login_response.status_code == 200
 
         form_data = {
-            "about":  f"Hi! i am vinith"
+            "about":  f"Hi! i am sumana"
         }
 
         user_update_response = client.post(
@@ -76,7 +74,9 @@ def test_edit_user_profile(client):
 
         user_object = User.query.filter_by(email='testuser1@test.com').first()
 
-        assert user_update_response.status_code == 400
+        assert user_object is not None
+        assert user_update_response.status_code == 200
+        assert user_object.about == 'Hi! i am sumana'
 
 
 def test_edit_user_account(client):
@@ -93,7 +93,8 @@ def test_edit_user_account(client):
             "password": "test123!test"
         },
                                      follow_redirects=True)
-        assert login_response.status_code == 400
+        assert login_response.status_code == 200
+        assert current_user.email == 'testuser1@test.com'
 
         form_data = {
             "email":  f"testuser123@test.com",
@@ -106,4 +107,6 @@ def test_edit_user_account(client):
             data=form_data,
             follow_redirects=True)
 
-        assert user_update_response.status_code == 400
+        assert user_update_response.status_code == 200
+        assert current_user.email == 'testuser123@test.com'
+
