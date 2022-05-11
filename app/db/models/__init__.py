@@ -72,3 +72,16 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.email
+
+class Transaction(db.Model, SerializerMixin):
+    __tablename__ = 'transactions'
+    id = db.Column(db.Integer, primary_key=True)
+    count = db.Column(db.Integer, default=0, unique= False)
+    balance = db.Column(db.Integer,default=0, unique= False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = relationship("User", back_populates="transactions", uselist=False)
+
+    def __init__(self, value):
+        self.count += 1
+        self.balance += value
+
