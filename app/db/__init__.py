@@ -33,3 +33,13 @@ def create_upload_folder():
     if not os.path.exists(uploadfolder):
         os.mkdir(uploadfolder)
     db.create_all()
+
+@database.before_app_first_request
+def create_log_folder():
+    root = config.Config.BASE_DIR
+    # set the name of the apps log folder to logs
+    logfolder = os.path.join(root,'..',config.Config.LOG_DIR)
+    # make a directory if it doesn't exist
+    if not os.path.exists(logfolder):
+        os.mkdir(logfolder)
+    db.create_all()

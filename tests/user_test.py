@@ -2,6 +2,8 @@ import logging
 
 from flask_login import current_user
 
+from flask import app
+
 from app import db
 from app.db.models import User, Transaction
 from faker import Faker
