@@ -6,9 +6,6 @@ from app import create_database
 
 runner = CliRunner()
 
-
-
-
 def test_create_database():
     response = runner.invoke(create_database)
     assert response.exit_code == 0
