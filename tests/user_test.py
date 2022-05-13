@@ -15,7 +15,7 @@ def test_adding_user(application):
         assert db.session.query(Transaction).count() == 0
         # showing how to add a record
         # create a record
-        user = User('a@b.com', 'sumanatest')
+        user = User('a@b.com', 'vinithtest')
         # add it to get ready to be committed
         db.session.add(user)
         # call the commit
@@ -23,10 +23,10 @@ def test_adding_user(application):
         # assert that we now have a new user
         assert db.session.query(User).count() == 1
         # finding one user record by email
-        user = User.query.filter_by(email='sbangaloreashok@gmail.com').first()
+        user = User.query.filter_by(email='a@b.com').first()
         log.info(user)
         # asserting that the user retrieved is correct
-        assert user.email == 'sbangaloreashok@gmail.com'
+        assert user.email == 'a@b.com'
         # this is how you get a related record ready for insert
         user.transactions = [Transaction("1", "2000", "CREDIT"), Transaction("2", "-1000", "DEBIT")]
         # commit is what saves the transactions
