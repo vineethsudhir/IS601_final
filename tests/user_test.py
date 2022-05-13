@@ -15,7 +15,7 @@ def test_adding_user(application):
         assert db.session.query(Transaction).count() == 0
         # showing how to add a record
         # create a record
-        user = User('sbangaloreashok@gmail.com', 'sumanatest')
+        user = User('a@b.com', 'sumanatest')
         # add it to get ready to be committed
         db.session.add(user)
         # call the commit
@@ -64,7 +64,7 @@ def test_edit_user_profile(client):
         assert login_response.status_code == 400
 
         form_data = {
-            "about":  f"Hi! i am sumana"
+            "about":  f"Hi! i am vinith"
         }
 
         user_update_response = client.post(
